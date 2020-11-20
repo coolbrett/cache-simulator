@@ -5,7 +5,6 @@ Brett Dale
 11/20/20
 """
 
-
 def main():
     # Data used to build the cache
     cache_setup_values = []
@@ -31,12 +30,18 @@ def main():
         if(len(cache_data[i - 3]) != 3):
             correct_data = False
 
-
     if(correct_data):
-        print(cache_setup_values)
-        print(cache_data)
+        cache_num_sets = cache_setup_values[0][1]
+        cache_set_size = cache_setup_values[1][1]
+        cache_line_size = cache_setup_values[2][1]
+        setup_cache(cache_num_sets, cache_set_size, cache_line_size)
     else:
         print("Invalid Data")
+
+
+def setup_cache(num_sets, set_size, line_size):
+
+
 
 
 if __name__ == '__main__':
