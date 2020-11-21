@@ -56,9 +56,9 @@ def calculate(hex_value, index_size, tag_size):
     #print(index)
     zero = list(str(0) * len(hex_to_bin))
     for i in range(tag_size):
-        zero[-1 - i - index_size] = hex_to_bin[-1 - i - index_size - 1]
+        zero[-1 - i] = hex_to_bin[-1 - i - index_size]
     tag = "".join(zero)
-    tag = tag[len(hex_to_bin) - index_size - tag_size: len(hex_to_bin) - tag_size]
+    tag = tag[len(hex_to_bin) - index_size - tag_size: len(hex_to_bin) - index_size]
     #print(tag)
 
     offset = hex_to_bin[:len(hex_to_bin) - index_size - tag_size]
