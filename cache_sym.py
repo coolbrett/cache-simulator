@@ -98,7 +98,11 @@ def print_config(set_size, total_sets, line_length):
     print("Cache Configuration\n")
     print("\t" + str(set_size) + "-way set associative entries")
     print("\t" + str(total_sets) + " sets total")
-    print("\t " + str(line_length) + " words per set\n\n")
+    print("\t " + str(line_length) + " words per set\n")
+    if(total_sets == 1):
+        print("\tDIRECT MAPPED CACHE\n")
+    else:
+        print("")
 
 #def print_results
 
