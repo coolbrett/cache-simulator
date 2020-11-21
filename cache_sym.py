@@ -34,7 +34,9 @@ def main():
         cache_num_sets = cache_setup_values[0][1]
         cache_set_size = cache_setup_values[1][1]
         cache_line_size = cache_setup_values[2][1]
-        calculate('1b', 2, 3)
+        values = calculate('aaaa', 3, 7)
+        print(values)
+
         setup_cache(cache_num_sets, cache_set_size, cache_line_size)
     else:
         print("Invalid Data")
@@ -44,10 +46,28 @@ def setup_cache(num_sets, set_size, line_size):
     print("Hello")
 
 def calculate(hex_value, index_size, tag_size):
+    values = []
     hex_to_bin = "{0:08b}".format(int(hex_value, 16))
     print(hex_to_bin)
-    index_value = int(hex_to_bin) >> len(hex_to_bin) - index_size
-    print(index_value)
+    zero = list(str(0) * len(hex_to_bin))
+    for i in range(index_size):
+        zero[-1 - i] = hex_to_bin[-1 - i]
+    index = "".join(zero)
+    #print(index)
+    zero = list(str(0) * len(hex_to_bin))
+    for i in range(tag_size):
+        zero[-1 - i - index_size] = hex_to_bin[-1 - i - index_size - 1]
+    tag = "".join(zero)
+    tag = tag[len(hex_to_bin) - index_size - tag_size: len(hex_to_bin) - tag_size]
+    #print(tag)
+
+    offset = hex_to_bin[:len(hex_to_bin) - index_size - tag_size]
+    #print(offset)
+    values.append(index)
+    values.append(tag)
+    values.append(offset)
+    return values
+
 
 
 
