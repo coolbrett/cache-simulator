@@ -7,7 +7,7 @@ Brett Dale
 
 class Set:
 
-    def __init__(self, size, current_lru=0, lines=[]):
+    def __init__(self, size, line_size, current_lru=0, lines=[]):
         """
         Constructor for a Set
         :param size: The size of the set
@@ -15,16 +15,19 @@ class Set:
         :param lines: The list of Lines that's contained in the set
         """
         self.__size = size
+        self.__line_size = line_size
         self.__current_lru = current_lru
         self.__lines = lines
 
-    def add_line(self, line):
+    def add_lines(self):
         """
         Adds a line to the list of sets
-        :param line: The Line object that's being stored
         :return: None
         """
-        self.__lines.append(line)
+        for i in range(self.__size):
+            line = Line(self.__line_size)
+            self.__lines.append(line)
+        #print(len(self.__lines))
 
     def hit_or_miss(self, tag):
         """
@@ -38,16 +41,35 @@ class Set:
                 was_hit = True
         return was_hit
 
+    def get_size(self):
+        return self.__size
 
+    def print_lines(self):
+        for i in range(self.__size):
+            print(self.__lines[i].get_values())
 
+    def get_line(self, tag):
+        for i in range(self.__size):
+            if(self.__lines[i].get_tag == tag):
+                return self.__lines[i]
 
+    def is_full(self):
+        is_full = False
+        i = 0
+        for i in range(self.__size):
+            if(self.__lines[i].get_valid() == 1):
+                i += 1
+        if(i == self.__size):
+            is_full = True
+        return is_full
 
-
+    def get_lines(self):
+        return self.__lines
 
 
 class Line:
 
-    def __init__(self, line_size, address, valid=0, lru=0, tag=0, mem_refs=0):
+    def __init__(self, line_size, address=0, valid=0, lru=0, tag=0, mem_refs=0):
         self.__size = line_size
         self.__line_size = line_size
         self.__address = address
@@ -55,6 +77,9 @@ class Line:
         self.__lru = lru
         self.__tag = tag
         self.__mem_refs = mem_refs
+        self.__data=[]
+        for i in range(self.__line_size):
+            self.__data.append(0)
 
     def set_valid(self):
         self.__valid = 1
@@ -73,3 +98,6 @@ class Line:
 
     def get_tag(self):
         return self.__tag
+
+    def get_values(self):
+        return self.__data
