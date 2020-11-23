@@ -9,6 +9,7 @@ Brett Dale
 def main():
     # Data used to build the cache
     cache_setup_values = []
+    stats = []
 
     # Data used within the cache
     cache_data = []
@@ -35,12 +36,29 @@ def main():
         cache_line_size = cache_setup_values[2][1]
         cache = Cache(cache_num_sets, cache_set_size, cache_line_size)
         cache.setup_cache()
+        #print(len(cache.get_sets()))
+        #print(len(cache.get_sets()[1].get_lines()))
+        #for i in range(len(cache.get_sets())):
+         #   cache.get_sets()[i].add_lines()
+        k = 0
         for i in range(len(cache.get_sets())):
-            cache.get_sets()[i].add_lines()
-
-        for i in range(len(cache.get_sets())):
-            print(i)
+            #print(i)
             cache.get_sets()[i].print_lines()
+            for j in range(len(cache.get_sets()[i].get_lines())):
+                #print(k)
+                #print(len(cache.get_sets()[i].get_lines()))
+                k += 1
+                stats.append(cache.get_sets()[i].get_lines()[j].create_stat())
+        #for i in range(len(stats)):
+            #print(stats[i])
+
+
+
+        # for i in range(int(cache_num_sets)):                                     #Used when the user enters F
+        #     cache.get_sets()[i].create_stats(i)
+        #     print(cache.get_sets()[i].get_stats()[i])
+
+
 
 
 
@@ -57,11 +75,16 @@ def main():
 
 class Cache:
 
-    def __init__(self, num_sets, set_size, line_size, sets=[]):
+    def __init__(self, num_sets, set_size, line_size, sets=[], total_hits=0, total_misses=0, total_access=0, total_mem_refs=0, stats=[]):
         self.__num_sets = int(num_sets)
         self.__set_size = int(set_size)
         self.__line_size = int(line_size)
         self.__sets = sets
+        self.__total_hits = total_hits
+        self.__total_misses = total_misses
+        self.__total_access = total_access
+        self.__total_mem_refs = total_mem_refs
+        self.__stats = stats
 
     def setup_cache(self):
         """
@@ -71,6 +94,10 @@ class Cache:
         for i in range(int(self.__num_sets)):
             temp = Set(self.__set_size, self.__line_size)
             self.__sets.append(temp)
+
+        for i in range(int(self.__num_sets)):
+            print(self.__sets[i])
+            self.__sets[i].add_lines()
 
     def calculate(self, hex_value, offset_size, index_size):
         """
@@ -124,7 +151,12 @@ class Cache:
         else:
             print("")
 
-    #def print_results
+    def print_results(self):
+        print("Results for Each Reference\n")
+        print("Access Address    Tag   Index Offset Result Memrefs")
+        print("------ -------- ------- ----- ------ ------ -------")
+
+
     def get_sets(self):
         return self.__sets
 
