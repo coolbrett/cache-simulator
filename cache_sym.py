@@ -95,9 +95,11 @@ class Cache:
             temp = Set(self.__set_size, self.__line_size)
             self.__sets.append(temp)
 
-        for i in range(int(self.__num_sets)):
-            print(self.__sets[i])
-            self.__sets[i].add_lines()
+        #for i in range(int(self.__num_sets)):
+         #   print(self.__sets[i])
+          #  self.__sets[i].add_lines()
+        for set in self.__sets:
+            set.add_lines()
 
     def calculate(self, hex_value, offset_size, index_size):
         """
