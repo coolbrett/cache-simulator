@@ -209,8 +209,9 @@ class Cache:
             print(stat.to_string())
         for i in range(len(self.__stats)):
             total_mem_refs += self.__stats[i].get_mem_refs()
-        self.__hit_ratio = self.__total_hits / (self.__total_misses + self.__total_hits)
-        self.__miss_ratio = self.__total_misses / (self.__total_hits + self.__total_misses)
+        self.__hit_ratio = round(self.__total_hits / (self.__total_misses + self.__total_hits), 6)
+
+        self.__miss_ratio = round(self.__total_misses / (self.__total_hits + self.__total_misses), 6)
 
         print("\nSimulation Summary Statistics")
         print("---------------------------")
@@ -234,7 +235,6 @@ class Cache:
         was_hit = False
         line = self.__sets[index].get_line(tag)
         if(line != None and line.get_valid() == 1):
-            print("first")
             if(isRead):
                 was_hit = True
                 self.__total_hits += 1
@@ -248,7 +248,6 @@ class Cache:
             self.__sets[index].increment_lru()
 
         elif(self.__sets[index].is_full()):
-            print("second")
             temp_line = self.__sets[index].get_lines()[0]
             for i in range(len(self.__sets[index].get_lines())):
                 if(self.__sets[index].get_lines()[i].get_lru() < temp_line.get_lru()):
@@ -270,7 +269,6 @@ class Cache:
             self.__total_misses += 1
 
         else:
-            print("third")
             for i in range(self.__sets[index].get_size()):
                 if(self.__sets[index].get_lines()[i].get_valid() == 0):
                     self.__sets[index].get_lines()[i].set_valid()
