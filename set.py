@@ -31,14 +31,9 @@ class Set(object):
         :return: None
         """
         for i in range(self.__size):
-            #print(self.__size)
-            #print(i)
             line = Line(self.__line_size)
-            #print(line)
             self.__lines.append(line)
-            print(self.__lines)
-
-        #print(len(self.__lines))
+            #print(self.__lines)
 
     def hit_or_miss(self, tag):
         """
@@ -63,15 +58,20 @@ class Set(object):
         for i in range(self.__size):
             print(self.__lines[i].get_values())
 
+    def increment_lru(self):
+        self.__current_lru += 1
+
     def get_line(self, tag):
         """
         Gets the line in the set based off the tag, if it exists
         :param tag: The tag that's being checked
         :return: the line with the same tag, None if it doesn't exist
         """
+        line = None
         for i in range(self.__size):
-            if(self.__lines[i].get_tag == tag):
-                return self.__lines[i]
+            if(self.__lines[i].get_tag() == tag):
+                line = self.__lines[i]
+        return line
 
     def is_full(self):
         """
@@ -87,12 +87,26 @@ class Set(object):
             is_full = True
         return is_full
 
+    def find_line_index(self, line):
+        index = 0
+        for i in range(len(self.__lines)):
+            if(self.__lines[i] == line):
+                index = i
+                break
+        return index
+
     def get_lines(self):
         """
         Returns the list of lines
-        :return: the list of lines
+        :return: the list of linesanother_line
         """
         return self.__lines
+
+    def get_line_size(self):
+        return self.__line_size
+
+    def set_line(self, line, index):
+        self.__lines[index] = line
 
     def create_stats(self, index):
         """
@@ -100,7 +114,6 @@ class Set(object):
         :param index: The index of the current set
         :return: None
         """
-        #self.__lines[1].set_valid()
         message = "set " + str(index) + "\n"
         for i in range(self.__size):
             if(self.__lines[i].get_valid() == 0):
@@ -115,5 +128,8 @@ class Set(object):
 
     def get_stats(self):
         return self.__stats
+
+    def get_lru(self):
+        return self.__current_lru
 
 

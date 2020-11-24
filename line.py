@@ -1,6 +1,6 @@
 class Line(object):
 
-    def __init__(self, line_size, address=0, valid=0, lru=0, tag=0, mem_refs=0, is_read=None):
+    def __init__(self, line_size, address=0, valid=0, lru=0, tag=0, mem_refs=0, is_read=None, dirty_bit=False):
         self.__size = line_size
         self.__line_size = line_size
         self.__address = address
@@ -10,6 +10,7 @@ class Line(object):
         self.__mem_refs = mem_refs
         self.__is_read = is_read
         self.__data=[]
+        self.__dirty_bit = dirty_bit
         for i in range(self.__line_size):
             self.__data.append(0)
 
@@ -64,6 +65,9 @@ class Line(object):
         :return: None
         """
         self.__tag = tag
+
+    def set_dirty(self, is_dirty):
+        self.__dirty_bit = is_dirty
 
     def get_tag(self):
         """

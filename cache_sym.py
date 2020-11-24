@@ -1,5 +1,7 @@
 import sys
-from Set import Set
+from set import Set
+from line import Line
+import math
 """
 Gatlin Cruz
 Brett Dale
@@ -12,7 +14,7 @@ def main():
     stats = []
 
     # Data used within the cache
-    cache_data = []
+    cache_accesses = []
 
     # Contents of the file being passed in to stdin
     file_contents = sys.stdin.read().splitlines()
@@ -26,8 +28,8 @@ def main():
             correct_data = False
 
     for i in range(3, len(file_contents)):
-        cache_data.append(file_contents[i].split(":"))
-        if(len(cache_data[i - 3]) != 3):
+        cache_accesses.append(file_contents[i].split(":"))
+        if(len(cache_accesses[i - 3]) != 3):
             correct_data = False
 
     if(correct_data):
@@ -40,42 +42,74 @@ def main():
         #print(len(cache.get_sets()[1].get_lines()))
         #for i in range(len(cache.get_sets())):
          #   cache.get_sets()[i].add_lines()
-        k = 0
+
         for i in range(len(cache.get_sets())):
             #print(i)
-            cache.get_sets()[i].print_lines()
+            #cache.get_sets()[i].print_lines()
             for j in range(len(cache.get_sets()[i].get_lines())):
                 #print(k)
                 #print(len(cache.get_sets()[i].get_lines()))
-                k += 1
                 stats.append(cache.get_sets()[i].get_lines()[j].create_stat())
         #for i in range(len(stats)):
             #print(stats[i])
 
+        """
+        Calculate the size for offset, and index
+        """
+        offset = math.log(int(cache_line_size), 2)
+
+        index = math.log(int(cache_num_sets), 2)
 
 
-        # for i in range(int(cache_num_sets)):                                     #Used when the user enters F
-        #     cache.get_sets()[i].create_stats(i)
-        #     print(cache.get_sets()[i].get_stats()[i])
+        for i in range(len(cache_accesses)):
+            values = cache.calculate(str(cache_accesses[i][0]), int(offset), int(index))
+            offset_value = int(values[0])
+            offset_v = cache.bin_to_dec(offset_value)
+            index_value = int(values[1])
+            index_v = cache.bin_to_dec(index_value)
+            tag_value = int(values[2])
+            tag_v = cache.bin_to_dec(tag_value)
+            if(cache_accesses[i][1] == "R" or cache_accesses[i][1] == "r"):
+                cache.check_cache(True, offset_v, index_v, tag_v, cache_accesses[i][0])
+                #print("Hello")
+            else:
+                cache.check_cache(False, offset_v, index_v, tag_v, cache_accesses[i][0])
+                #print("Hi there")
+
+
+        cache.print_results()
+
+
+
+        for i in range(int(cache_num_sets)):                                     #Used when the user enters F
+            cache.get_sets()[i].create_stats(i)
+            for j in range(len(cache.get_sets()[i].get_stats())):
+                print(cache.get_sets()[i].get_stats()[j])
 
 
 
 
 
 
-        #values = cache.calculate('11', 4, 3)
-        #print(values)
-        #print(bin_to_dec(int(values[0])))
-        #print(bin_to_dec(int(values[1])))
-        #print(bin_to_dec(int(values[2])))
-        #print_config(cache_set_size, cache_num_sets, int(cache_line_size) // 4)
+        # values = cache.calculate('3d1', 4, 3)
+        # print(values)
+        # print(cache.bin_to_dec(int(values[0])))
+        # print(cache.bin_to_dec(int(values[1])))
+        # print(cache.bin_to_dec(int(values[2])))
+        # cache.print_config(cache_set_size, cache_num_sets, int(cache_line_size) // 4)
     else:
         print("Invalid Data")
 
 
+
 class Cache:
 
-    def __init__(self, num_sets, set_size, line_size, sets=[], total_hits=0, total_misses=0, total_access=0, total_mem_refs=0, stats=[]):
+    def __init__(self, num_sets, set_size, line_size, sets=None, total_hits=0, total_misses=0, total_access=0,
+                 total_mem_refs=0, stats=None):
+        if sets is None:
+            sets = []
+        if stats is None:
+            stats = []
         self.__num_sets = int(num_sets)
         self.__set_size = int(set_size)
         self.__line_size = int(line_size)
@@ -103,7 +137,7 @@ class Cache:
 
     def calculate(self, hex_value, offset_size, index_size):
         """
-        Takes in the bit size for index and tag and returnsindex a list of the 3 values
+        Takes in the bit size for index and tag and returns index a list of the 3 values
         :param hex_value:
         :param index_size:
         :param tag_size:
@@ -111,9 +145,21 @@ class Cache:
         """
         values = []
         hex_to_bin = "{0:08b}".format(int(hex_value, 16))
-        print(hex_to_bin)
+
+        if(len(hex_to_bin) % 4 != 0):
+            num = (4 - len(hex_to_bin) % 4)
+            str_num = ""
+            for i in range(num):
+                str_num += "0"
+
+            hex_to_bin = str_num + hex_to_bin
+
+
+
+
+        #print(hex_to_bin)
         zero = list(str(0) * len(hex_to_bin))
-        for i in range(offset_size):
+        for i in range(int(offset_size)):
             zero[-1 - i] = hex_to_bin[-1 - i]
         offset = "".join(zero)
         offset = offset[len(hex_to_bin) - offset_size:]
@@ -157,28 +203,93 @@ class Cache:
         print("Results for Each Reference\n")
         print("Access Address    Tag   Index Offset Result Memrefs")
         print("------ -------- ------- ----- ------ ------ -------")
+        for stat in self.__stats:
+            print(stat.to_string())
 
 
     def get_sets(self):
         return self.__sets
 
 
-    def check_cache(self, isRead, offset, index, tag):
-        line = self.__num_sets[index].get_line(tag)
+    def check_cache(self, isRead, offset, index, tag, address):
+        mem_refs = 0
+        was_hit = False
+        line = self.__sets[index].get_line(tag)
+        #print(line)
         if(line != None and line.get_valid() == 1):
             if(isRead):
-                print("Hit")
+                was_hit = True
             else:
-                print("Hit and memref += 1")
+                was_hit = True
+                if(line.is_dirty()):
+                    mem_refs += 1
+                    line.set_dirty(False)
+                else:
+                    line.set_dirty(True)
         elif(self.__sets[index].is_full()):
-            print("Get the lru and replace lowest lru")
+            other_line = self.__sets[index].get_lines()[0]
+            for i in range(len(self.__sets[index].get_lines())):
+                if(self.__sets[index].get_lines()[i].get_lru() < other_line.get_lru()):
+                    other_line = self.__sets[index].get_lines()[i]
+            line_index = self.__sets[index].find_line_index(other_line)
+            diff_line = Line(self.__sets[index].get_line_size(), address, 1, self.__sets[index].get_lru() + 1, tag, mem_refs, isRead)
+            self.__sets[index].increment_lru()
+            self.__sets[index].set_line(diff_line, line_index)
         else:
             for i in range(self.__sets[index].get_size()):
-                if(self.__sets[index].get_lines()[i].get_valid == 0):
-                    self.__sets[index].get_lines()[i].set_valid = 1
-                    self.__sets[index].get_lines()[i].set_lru = 0
-                    self.__sets[index].get_lines()[i].set_tag = tag
+                if(self.__sets[index].get_lines()[i].get_valid() == 0):
+                    self.__sets[index].get_lines()[i].set_valid()
+                    self.__sets[index].get_lines()[i].set_lru(self.__sets[index].get_lru() + 1)
+                    self.__sets[index].get_lines()[i].set_tag(tag)
+                    if(isRead):
+                        mem_refs += 1
+                    else:
+                        mem_refs += 2
+                    break
                     #TODO Come back to this
+        access = ""
+        hit_or_miss = ""
+        if(isRead):
+            access = "read"
+        else:
+            access = "write"
+        if(was_hit):
+            hit_or_miss = "HIT"
+        else:
+            hit_or_miss = "MISS"
+        temp = Cache_Result(access, address, tag, index, offset, hit_or_miss, mem_refs)
+        self.__stats.append(temp)
+
+
+
+
+class Cache_Result(object):
+
+    def __init__(self, access, address, tag, index, offset, result, mem_refs=0):
+        self.__access = access
+        self.__address = address
+        self.__tag = tag
+        self.__index = index
+        self.__offset = offset
+        self.__result = result
+        self.__mem_refs = mem_refs
+
+    def increment_mem_refs(self):
+        self.__mem_refs += 1
+
+    def get_mem_refs(self):
+        return self.__mem_refs
+
+    def is_this_result(self, tag, index):
+        is_this_result = False
+        if(tag == self.__tag and index == self.__index):
+            is_this_result = True
+        return is_this_result
+
+    def to_string(self):
+        message = "   " + self.__access + "\t" + str(self.__address) + "\t" + str(self.__tag) + "\t"\
+                  + str(self.__index) + "\t" + str(self.__offset) + "\t" + self.__result + "\t" + str(self.__mem_refs)
+        return message
 
 
 if __name__ == '__main__':
