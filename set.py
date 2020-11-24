@@ -121,7 +121,8 @@ class Set(object):
                 if i < (self.__size - 1):
                     message += "\n"
             else:
-                message += "\tline " + str(i) + " = byte address " + str(self.__lines[i].get_address()) + ", tag " + str(self.__lines[i].get_tag()) + ", lru " + str(self.__lines[i].get_lru())
+                message += "\tline " + str(i) + " = byte address " + str(self.__lines[i].get_address()) + "-" + str(hex((int(str(self.__lines[i].get_address()),16) + int(self.__line_size)) - 1)).strip("0x") \
+                + ", tag " + str(self.__lines[i].get_tag()) + ", lru " + str(self.__lines[i].get_lru())
                 if i < (self.__size - 1):
                     message += "\n"
         self.__stats.append(message)

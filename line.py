@@ -14,6 +14,9 @@ class Line(object):
         for i in range(self.__line_size):
             self.__data.append(0)
 
+    def to_string(self):
+        print(str(self.__line_size) + " " + str(self.__address))
+
     def set_valid(self):
         """
         Sets the valid field to 1
@@ -104,10 +107,14 @@ class Line(object):
             stat.append("read")
         else:
             stat.append("write")
-        stat.append(self.__address)
+        address_range = int(hex(self.__line_size), 16) + int(str(self.__address), 16)
+        #stat.append(self.__address)
+        stat.append(str(self.__address) + "-" + str(address_range))
         stat.append(self.__tag)
         stat.append("index")
         stat.append("offset")
         stat.append("HIT/MISS")
         stat.append(self.__mem_refs)
         return stat
+
+
