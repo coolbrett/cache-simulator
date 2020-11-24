@@ -69,6 +69,9 @@ class Line(object):
     def set_dirty(self, is_dirty):
         self.__dirty_bit = is_dirty
 
+    def is_dirty(self):
+        return self.__dirty_bit
+
     def get_tag(self):
         """
         Returns the tag

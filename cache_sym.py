@@ -38,28 +38,17 @@ def main():
         cache_line_size = cache_setup_values[2][1]
         cache = Cache(cache_num_sets, cache_set_size, cache_line_size)
         cache.setup_cache()
-        #print(len(cache.get_sets()))
-        #print(len(cache.get_sets()[1].get_lines()))
-        #for i in range(len(cache.get_sets())):
-         #   cache.get_sets()[i].add_lines()
+        cache.set_total_access(len(cache_accesses))
 
         for i in range(len(cache.get_sets())):
-            #print(i)
-            #cache.get_sets()[i].print_lines()
             for j in range(len(cache.get_sets()[i].get_lines())):
-                #print(k)
-                #print(len(cache.get_sets()[i].get_lines()))
                 stats.append(cache.get_sets()[i].get_lines()[j].create_stat())
-        #for i in range(len(stats)):
-            #print(stats[i])
 
         """
         Calculate the size for offset, and index
         """
         offset = math.log(int(cache_line_size), 2)
-
         index = math.log(int(cache_num_sets), 2)
-
 
         for i in range(len(cache_accesses)):
             values = cache.calculate(str(cache_accesses[i][0]), int(offset), int(index))
@@ -71,32 +60,18 @@ def main():
             tag_v = cache.bin_to_dec(tag_value)
             if(cache_accesses[i][1] == "R" or cache_accesses[i][1] == "r"):
                 cache.check_cache(True, offset_v, index_v, tag_v, cache_accesses[i][0])
-                #print("Hello")
             else:
                 cache.check_cache(False, offset_v, index_v, tag_v, cache_accesses[i][0])
-                #print("Hi there")
-
-
+        cache.print_config(cache_set_size, cache_num_sets, cache_line_size)
+        print("\n")
         cache.print_results()
-
-
-
+        print("\tFinal Data Cache State")
+        print("\t-------------------------")
         for i in range(int(cache_num_sets)):                                     #Used when the user enters F
             cache.get_sets()[i].create_stats(i)
             for j in range(len(cache.get_sets()[i].get_stats())):
                 print(cache.get_sets()[i].get_stats()[j])
 
-
-
-
-
-
-        # values = cache.calculate('3d1', 4, 3)
-        # print(values)
-        # print(cache.bin_to_dec(int(values[0])))
-        # print(cache.bin_to_dec(int(values[1])))
-        # print(cache.bin_to_dec(int(values[2])))
-        # cache.print_config(cache_set_size, cache_num_sets, int(cache_line_size) // 4)
     else:
         print("Invalid Data")
 
@@ -105,7 +80,7 @@ def main():
 class Cache:
 
     def __init__(self, num_sets, set_size, line_size, sets=None, total_hits=0, total_misses=0, total_access=0,
-                 total_mem_refs=0, stats=None):
+                 total_mem_refs=0, stats=None, hit_ratio=0, miss_ratio=0):
         if sets is None:
             sets = []
         if stats is None:
@@ -119,6 +94,8 @@ class Cache:
         self.__total_access = total_access
         self.__total_mem_refs = total_mem_refs
         self.__stats = stats
+        self.__hit_ratio = hit_ratio
+        self.__miss_ratio = miss_ratio
 
     def setup_cache(self):
         """
@@ -134,6 +111,9 @@ class Cache:
           #  self.__sets[i].add_lines()
         for set in self.__sets:
             set.add_lines()
+
+    def set_total_access(self, accesses):
+        self.__total_access = accesses
 
     def calculate(self, hex_value, offset_size, index_size):
         """
@@ -190,21 +170,38 @@ class Cache:
 
 
     def print_config(self, set_size, total_sets, line_length):
-        print("Cache Configuration\n")
+        print("\nCache Configuration\n")
         print("\t" + str(set_size) + "-way set associative entries")
         print("\t" + str(total_sets) + " sets total")
-        print("\t " + str(line_length) + " words per set\n")
+        print("\t " + str(int(line_length) // 4) + " words per set\n")
         if(total_sets == 1):
             print("\tDIRECT MAPPED CACHE\n")
         else:
             print("")
 
     def print_results(self):
+        hit_ratio = 0
+        miss_ratio = 0
+        total_mem_refs = 0
         print("Results for Each Reference\n")
         print("Access Address    Tag   Index Offset Result Memrefs")
         print("------ -------- ------- ----- ------ ------ -------")
         for stat in self.__stats:
             print(stat.to_string())
+        for i in range(len(self.__stats)):
+            total_mem_refs += self.__stats[i].get_mem_refs()
+        self.__hit_ratio = self.__total_hits / (self.__total_misses + self.__total_hits)
+        self.__miss_ratio = self.__total_misses / (self.__total_hits + self.__total_misses)
+
+        print("Simulation Summary Statistics")
+        print("---------------------------")
+        print("Total hits                      : " + str(self.__total_hits))
+        print("Total misses                    : " + str(self.__total_misses))
+        print("Total accesses                  : " + str(self.__total_access))
+        print("Hit ratio                       : " + str(self.__hit_ratio))
+        print("Miss ratio                      : " + str(self.__miss_ratio) + "\n")
+
+
 
 
     def get_sets(self):
@@ -219,8 +216,10 @@ class Cache:
         if(line != None and line.get_valid() == 1):
             if(isRead):
                 was_hit = True
+                self.__total_hits += 1
             else:
                 was_hit = True
+                self.__total_hits += 1
                 if(line.is_dirty()):
                     mem_refs += 1
                     line.set_dirty(False)
@@ -235,6 +234,7 @@ class Cache:
             diff_line = Line(self.__sets[index].get_line_size(), address, 1, self.__sets[index].get_lru() + 1, tag, mem_refs, isRead)
             self.__sets[index].increment_lru()
             self.__sets[index].set_line(diff_line, line_index)
+            self.__total_misses += 1
         else:
             for i in range(self.__sets[index].get_size()):
                 if(self.__sets[index].get_lines()[i].get_valid() == 0):
@@ -246,6 +246,7 @@ class Cache:
                     else:
                         mem_refs += 2
                     break
+            self.__total_misses += 1
                     #TODO Come back to this
         access = ""
         hit_or_miss = ""
@@ -259,8 +260,6 @@ class Cache:
             hit_or_miss = "MISS"
         temp = Cache_Result(access, address, tag, index, offset, hit_or_miss, mem_refs)
         self.__stats.append(temp)
-
-
 
 
 class Cache_Result(object):
