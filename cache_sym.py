@@ -244,7 +244,6 @@ class Cache:
                 if(not line.is_dirty()):
                     line.set_dirty(True)
 
-
             line.set_lru(self.__sets[index].get_lru() + 1)
             self.__sets[index].increment_lru()
 

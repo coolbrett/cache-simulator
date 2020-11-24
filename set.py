@@ -33,7 +33,7 @@ class Set(object):
         for i in range(self.__size):
             line = Line(self.__line_size)
             self.__lines.append(line)
-            #print(self.__lines)
+
 
     def hit_or_miss(self, tag):
         """
@@ -121,7 +121,9 @@ class Set(object):
                 if i < (self.__size - 1):
                     message += "\n"
             else:
-                message += "\tline " + str(i) + " = byte address " + str(self.__lines[i].get_address()) + "-" + str(hex((int(str(self.__lines[i].get_address()),16) + int(self.__line_size)) - 1)).strip("0x") \
+                message += "\tline " + str(i) + " = byte address " + str(self.__lines[i].get_address()) + "-" \
+                           + str(hex((int(str(self.__lines[i].get_address()),16)
+                                      + int(self.__line_size)) - 1)).strip("0x") \
                 + ", tag " + str(self.__lines[i].get_tag()) + ", lru " + str(self.__lines[i].get_lru())
                 if i < (self.__size - 1):
                     message += "\n"
@@ -131,6 +133,10 @@ class Set(object):
         return self.__stats
 
     def get_lru(self):
+        """
+
+        :return:
+        """
         return self.__current_lru
 
 
