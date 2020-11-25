@@ -1,4 +1,5 @@
 from line import Line
+
 """
 Gatlin Cruz
 Brett Dale
@@ -34,7 +35,6 @@ class Set(object):
             line = Line(self.__line_size)
             self.__lines.append(line)
 
-
     def hit_or_miss(self, tag):
         """
         Tells if data being accessed was a hit or miss
@@ -43,7 +43,7 @@ class Set(object):
         """
         was_hit = False
         for line in self.__lines:
-            if(line.get_tag() == tag and line.get_valid() == 1):
+            if (line.get_tag() == tag and line.get_valid() == 1):
                 was_hit = True
         return was_hit
 
@@ -59,6 +59,10 @@ class Set(object):
             print(self.__lines[i].get_values())
 
     def increment_lru(self):
+        """
+        Method to increment lru
+        :return: None
+        """
         self.__current_lru += 1
 
     def get_line(self, tag):
@@ -69,7 +73,7 @@ class Set(object):
         """
         line = None
         for i in range(self.__size):
-            if(self.__lines[i].get_tag() == tag):
+            if (self.__lines[i].get_tag() == tag):
                 line = self.__lines[i]
         return line
 
@@ -81,16 +85,21 @@ class Set(object):
         is_full = False
         i = 0
         for i in range(self.__size):
-            if(self.__lines[i].get_valid() == 1):
+            if (self.__lines[i].get_valid() == 1):
                 i += 1
-        if(i == self.__size):
+        if (i == self.__size):
             is_full = True
         return is_full
 
     def find_line_index(self, line):
+        """
+        Method to find line index
+        :param line: line to check index for
+        :return: the index of line
+        """
         index = 0
         for i in range(len(self.__lines)):
-            if(self.__lines[i] == line):
+            if (self.__lines[i] == line):
                 index = i
                 break
         return index
@@ -103,9 +112,19 @@ class Set(object):
         return self.__lines
 
     def get_line_size(self):
+        """
+        Method to get line size
+        :return: line size
+        """
         return self.__line_size
 
     def set_line(self, line, index):
+        """
+        Method to set line
+        :param line: line to be set
+        :param index: index to set to line
+        :return: None
+        """
         self.__lines[index] = line
 
     def create_stats(self, index):
@@ -116,27 +135,33 @@ class Set(object):
         """
         message = "set " + str(index) + "\n"
         for i in range(self.__size):
-            if(self.__lines[i].get_valid() == 0):
+            if (self.__lines[i].get_valid() == 0):
                 message += "\tline " + str(i) + " = invalid"
                 if i < (self.__size - 1):
                     message += "\n"
             else:
-                message += "\tline " + str(i) + " = byte address " + str(self.__lines[i].get_address()) + "-" \
-                           + str(hex((int(str(self.__lines[i].get_address()),16)
-                                      + int(self.__line_size)) - 1)).strip("0x") \
-                + ", tag " + str(self.__lines[i].get_tag()) + ", lru " + str(self.__lines[i].get_lru())
+                message += "\tline " + str(i) + " = byte address " + str(
+                    self.__lines[i].get_address()) + "-" \
+                           + str(
+                    hex((int(str(self.__lines[i].get_address()), 16)
+                         + int(self.__line_size)) - 1)).strip("0x") \
+                           + ", tag " + str(
+                    self.__lines[i].get_tag()) + ", lru " + str(
+                    self.__lines[i].get_lru())
                 if i < (self.__size - 1):
                     message += "\n"
         self.__stats.append(message)
 
     def get_stats(self):
+        """
+        Method to get stats field
+        :return: stats field
+        """
         return self.__stats
 
     def get_lru(self):
         """
-
-        :return:
+        Method to get lru
+        :return: lru field
         """
         return self.__current_lru
-
-
