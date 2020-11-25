@@ -1,9 +1,9 @@
 """
-This represents a Line object
-__author__:Gatlin Cruz
-__author__: Brett Dale
-__version__: 11/19/20
+Gatlin Cruz
+Brett Dale
+11/24/2020
 """
+
 class Line(object):
     """
     Class for Line objects
