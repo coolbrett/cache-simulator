@@ -55,8 +55,8 @@ def go(show_final_stats):
         if (len(cache_accesses[i - 3]) != 3):
             correct_data = False
     if (int(cache_setup_values[2][1]) < 4 or int(
-            cache_setup_values[2][1]) % 2 != 0 or int(
-            cache_setup_values[0][1]) % 2 != 0):
+            cache_setup_values[2][1]) % 2 != 0 or (int(
+            cache_setup_values[0][1]) % 2 != 0 and int(cache_setup_values[0][1]) != 1)):
         correct_data = False
 
     if (correct_data):
