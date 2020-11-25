@@ -1,3 +1,9 @@
+"""
+Gatlin Cruz
+Brett Dale
+11/24/2020
+"""
+
 class Line(object):
     """
     Class for Line objects
