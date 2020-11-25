@@ -1,11 +1,11 @@
 from line import Line
 
 """
-Gatlin Cruz
-Brett Dale
-11/20/20
+This represents a Set object
+__author__:Gatlin Cruz
+__author__: Brett Dale
+__version__: 11/19/20
 """
-
 
 class Set(object):
 
