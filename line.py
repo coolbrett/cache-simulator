@@ -1,6 +1,21 @@
 class Line(object):
+    """
+    Class for Line objects
+    """
 
-    def __init__(self, line_size, address=0, valid=0, lru=0, tag=0, mem_refs=0, is_read=None, dirty_bit=False):
+    def __init__(self, line_size, address=0, valid=0, lru=0, tag=0, mem_refs=0,
+                 is_read=None, dirty_bit=False):
+        """
+        Constructor for Line objects
+        :param line_size: line size
+        :param address: address to be set
+        :param valid: preset valid parameter
+        :param lru: preset lru parameter
+        :param tag: preset tag parameter
+        :param mem_refs: preset memory references parameter
+        :param is_read: preset is_read parameter
+        :param dirty_bit: False preset dirty_bit parameter
+        """
         self.__size = line_size
         self.__line_size = line_size
         self.__address = address
@@ -9,12 +24,16 @@ class Line(object):
         self.__tag = tag
         self.__mem_refs = mem_refs
         self.__is_read = is_read
-        self.__data=[]
+        self.__data = []
         self.__dirty_bit = dirty_bit
         for i in range(self.__line_size):
             self.__data.append(0)
 
     def to_string(self):
+        """
+        Method to display line size and address
+        :return: None
+        """
         print(str(self.__line_size) + " " + str(self.__address))
 
     def set_valid(self):
@@ -70,9 +89,18 @@ class Line(object):
         self.__tag = tag
 
     def set_dirty(self, is_dirty):
+        """
+        Method to set is_dirty field
+        :param is_dirty: param to set is_dirty
+        :return: None
+        """
         self.__dirty_bit = is_dirty
 
     def is_dirty(self):
+        """
+        Method to check is_dirty field
+        :return: is_dirty field
+        """
         return self.__dirty_bit
 
     def get_tag(self):
@@ -103,12 +131,13 @@ class Line(object):
         :return: the list of strings
         """
         stat = []
-        if(self.__is_read):
+        if (self.__is_read):
             stat.append("read")
         else:
             stat.append("write")
-        address_range = int(hex(self.__line_size), 16) + int(str(self.__address), 16)
-        #stat.append(self.__address)
+        address_range = int(hex(self.__line_size), 16) + int(
+            str(self.__address), 16)
+        # stat.append(self.__address)
         stat.append(str(self.__address) + "-" + str(address_range))
         stat.append(self.__tag)
         stat.append("index")
@@ -116,5 +145,3 @@ class Line(object):
         stat.append("HIT/MISS")
         stat.append(self.__mem_refs)
         return stat
-
-

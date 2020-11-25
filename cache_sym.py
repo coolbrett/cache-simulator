@@ -2,6 +2,7 @@ import sys
 from set import Set
 from line import Line
 import math
+
 """
 Gatlin Cruz
 Brett Dale
@@ -10,9 +11,13 @@ Brett Dale
 
 
 def main():
+    """
+    Main method that checks argument size, then calls go method
+    :return: None
+    """
     show_final_stats = False
-    if(len(sys.argv) < 3):
-        if(len(sys.argv) == 2 and sys.argv[1].lower() == "f"):
+    if (len(sys.argv) < 3):
+        if (len(sys.argv) == 2 and sys.argv[1].lower() == "f"):
             show_final_stats = True
         go(show_final_stats)
 
@@ -21,6 +26,11 @@ def main():
 
 
 def go(show_final_stats):
+    """
+    Driver for our program. Everything is ran and called in this method
+    :param show_final_stats:
+    :return: None
+    """
     # Data used to build the cache
     cache_setup_values = []
     stats = []
@@ -43,7 +53,8 @@ def go(show_final_stats):
         cache_accesses.append(file_contents[i].split(":"))
         if (len(cache_accesses[i - 3]) != 3):
             correct_data = False
-    if (int(cache_setup_values[2][1]) < 4 or int(cache_setup_values[2][1]) % 2 != 0 or int(
+    if (int(cache_setup_values[2][1]) < 4 or int(
+            cache_setup_values[2][1]) % 2 != 0 or int(
             cache_setup_values[0][1]) % 2 != 0):
         correct_data = False
 
@@ -66,7 +77,8 @@ def go(show_final_stats):
         index = math.log(int(cache_num_sets), 2)
 
         for i in range(len(cache_accesses)):
-            values = cache.calculate(str(cache_accesses[i][0]), int(offset), int(index))
+            values = cache.calculate(str(cache_accesses[i][0]), int(offset),
+                                     int(index))
             offset_value = int(values[0])
             offset_v = cache.bin_to_dec(offset_value)
             index_value = int(values[1])
@@ -74,14 +86,16 @@ def go(show_final_stats):
             tag_value = int(values[2])
             tag_v = cache.bin_to_dec(tag_value)
             if (cache_accesses[i][1] == "R" or cache_accesses[i][1] == "r"):
-                cache.check_cache(True, offset_v, index_v, tag_v, cache_accesses[i][0])
+                cache.check_cache(True, offset_v, index_v, tag_v,
+                                  cache_accesses[i][0])
             else:
-                cache.check_cache(False, offset_v, index_v, tag_v, cache_accesses[i][0])
+                cache.check_cache(False, offset_v, index_v, tag_v,
+                                  cache_accesses[i][0])
         cache.print_config(cache_set_size, cache_num_sets, cache_line_size)
 
         cache.print_results()
 
-        if(show_final_stats):
+        if (show_final_stats):
             print("\tFinal Data Cache State")
             print("\t-------------------------")
             for i in range(int(cache_num_sets)):  # Used when the user enters F
@@ -95,9 +109,27 @@ def go(show_final_stats):
 
 
 class Cache:
+    """
+    Class for our Cache
+    """
 
-    def __init__(self, num_sets, set_size, line_size, sets=None, total_hits=0, total_misses=0, total_access=0,
+    def __init__(self, num_sets, set_size, line_size, sets=None, total_hits=0,
+                 total_misses=0, total_access=0,
                  total_mem_refs=0, stats=None, hit_ratio=0, miss_ratio=0):
+        """
+        Constructor for our Cache
+        :param num_sets: number of sets to allow
+        :param set_size: Size of sets
+        :param line_size: Size of lines
+        :param sets: optional list of sets
+        :param total_hits: total hits in the cache
+        :param total_misses: total misses in the cache
+        :param total_access: total accesses in the cache
+        :param total_mem_refs: total memory references in the cache
+        :param stats: attribute to hold stats
+        :param hit_ratio: calculated by hits/total
+        :param miss_ratio: calculated by misses/total
+        """
         if sets is None:
             sets = []
         if stats is None:
@@ -127,20 +159,25 @@ class Cache:
             set.add_lines()
 
     def set_total_access(self, accesses):
+        """
+        Setter method for total_access
+        :param accesses: variable to be set to total_access
+        :return: None
+        """
         self.__total_access = accesses
 
     def calculate(self, hex_value, offset_size, index_size):
         """
         Takes in the bit size for index and tag and returns index a list of the 3 values
-        :param hex_value:
-        :param index_size:
-        :param tag_size:
-        :return:
+        :param offset_size: size of offset
+        :param hex_value: hex value
+        :param index_size: index size
+        :return: list of values
         """
         values = []
         hex_to_bin = "{0:08b}".format(int(hex_value, 16))
 
-        if(len(hex_to_bin) % 4 != 0):
+        if (len(hex_to_bin) % 4 != 0):
             num = (4 - len(hex_to_bin) % 4)
             str_num = ""
             for i in range(num):
@@ -167,7 +204,6 @@ class Cache:
         values.append(tag)
         return values
 
-
     def bin_to_dec(self, binary):
         """
         Converts binary to decimal
@@ -175,13 +211,12 @@ class Cache:
         :return: The decimal value of the binary
         """
         decimal, i, n = 0, 0, 0
-        while(binary != 0):
+        while (binary != 0):
             dec = binary % 10
             decimal = decimal + dec * pow(2, i)
             binary = binary // 10
             i += 1
         return decimal
-
 
     def print_config(self, set_size, total_sets, line_length):
         """
@@ -195,12 +230,16 @@ class Cache:
         print("    " + str(set_size) + "-way set associative entries")
         print("    " + str(total_sets) + " sets total")
         print("     " + str(int(line_length) // 4) + " words per set\n")
-        if(int(set_size) == 1):
+        if (int(set_size) == 1):
             print("    DIRECT MAPPED CACHE\n")
-        elif(int(total_sets) == 1):
+        elif (int(total_sets) == 1):
             print("    FULLY ASSOCIATIVE CACHE\n")
 
     def print_results(self):
+        """
+        Prints the results from our Cache
+        :return: None
+        """
         total_mem_refs = 0
         print("Results for Each Reference\n")
         print("Access Address    Tag   Index Offset Result Memrefs")
@@ -209,9 +248,11 @@ class Cache:
             print(stat.to_string())
         for i in range(len(self.__stats)):
             total_mem_refs += self.__stats[i].get_mem_refs()
-        self.__hit_ratio = round(self.__total_hits / (self.__total_misses + self.__total_hits), 6)
+        self.__hit_ratio = round(
+            self.__total_hits / (self.__total_misses + self.__total_hits), 6)
 
-        self.__miss_ratio = round(self.__total_misses / (self.__total_hits + self.__total_misses), 6)
+        self.__miss_ratio = round(
+            self.__total_misses / (self.__total_hits + self.__total_misses), 6)
 
         print("\nSimulation Summary Statistics")
         print("---------------------------")
@@ -220,7 +261,8 @@ class Cache:
         print("Total accesses                  : " + str(self.__total_access))
         print("Total memory references         : " + str(self.__total_mem_refs))
         print("Hit ratio                       : " + str(self.__hit_ratio))
-        print("Miss ratio                      : " + str(self.__miss_ratio) + "\n")
+        print("Miss ratio                      : " + str(
+            self.__miss_ratio) + "\n")
 
     def get_sets(self):
         """
@@ -229,39 +271,51 @@ class Cache:
         """
         return self.__sets
 
-
     def check_cache(self, isRead, offset, index, tag, address):
+        """
+        Method to check cache for hits/misses
+        :param isRead: true/false variable to see if line is read or write
+        :param offset: offset value
+        :param index: index value
+        :param tag: tag value
+        :param address: address value
+        :return: None
+        """
         mem_refs = 0
         was_hit = False
         line = self.__sets[index].get_line(tag)
-        if(line != None and line.get_valid() == 1):
-            if(isRead):
+        if (line != None and line.get_valid() == 1):
+            if (isRead):
                 was_hit = True
                 self.__total_hits += 1
             else:
                 was_hit = True
                 self.__total_hits += 1
-                if(not line.is_dirty()):
+                if (not line.is_dirty()):
                     line.set_dirty(True)
 
             line.set_lru(self.__sets[index].get_lru() + 1)
             self.__sets[index].increment_lru()
 
-        elif(self.__sets[index].is_full()):
+        elif (self.__sets[index].is_full()):
             temp_line = self.__sets[index].get_lines()[0]
             for i in range(len(self.__sets[index].get_lines())):
-                if(self.__sets[index].get_lines()[i].get_lru() < temp_line.get_lru()):
+                if (self.__sets[index].get_lines()[
+                    i].get_lru() < temp_line.get_lru()):
                     temp_line = self.__sets[index].get_lines()[i]
             line_index = self.__sets[index].find_line_index(temp_line)
             mem_refs += 1
             self.__total_mem_refs += 1
 
-            new_line = Line(self.__sets[index].get_line_size(), str(hex(int(address, 16)-offset))[2:], 1, self.__sets[index].get_lru() + 1, tag, mem_refs, isRead)
-            if(temp_line.is_dirty()):
+            new_line = Line(self.__sets[index].get_line_size(),
+                            str(hex(int(address, 16) - offset))[2:], 1,
+                            self.__sets[index].get_lru() + 1, tag, mem_refs,
+                            isRead)
+            if (temp_line.is_dirty()):
                 mem_refs += 1
                 self.__total_mem_refs += 1
 
-            if(not isRead):
+            if (not isRead):
                 new_line.set_dirty(True)
 
             self.__sets[index].increment_lru()
@@ -270,13 +324,15 @@ class Cache:
 
         else:
             for i in range(self.__sets[index].get_size()):
-                if(self.__sets[index].get_lines()[i].get_valid() == 0):
+                if (self.__sets[index].get_lines()[i].get_valid() == 0):
                     self.__sets[index].get_lines()[i].set_valid()
-                    self.__sets[index].get_lines()[i].set_lru(self.__sets[index].get_lru() + 1)
+                    self.__sets[index].get_lines()[i].set_lru(
+                        self.__sets[index].get_lru() + 1)
                     self.__sets[index].increment_lru()
                     self.__sets[index].get_lines()[i].set_tag(tag)
-                    self.__sets[index].get_lines()[i].set_address(str(hex(int(address, 16)-offset))[2:])
-                    if(isRead):
+                    self.__sets[index].get_lines()[i].set_address(
+                        str(hex(int(address, 16) - offset))[2:])
+                    if (isRead):
                         mem_refs += 1
                         self.__total_mem_refs += 1
                     else:
@@ -285,21 +341,35 @@ class Cache:
                         self.__total_mem_refs += 1
                     break
             self.__total_misses += 1
-        if(isRead):
+        if (isRead):
             access = "read"
         else:
             access = "write"
-        if(was_hit):
+        if (was_hit):
             hit_or_miss = "HIT"
         else:
             hit_or_miss = "MISS"
-        temp = Cache_Result(access, address, tag, index, offset, hit_or_miss, mem_refs)
+        temp = Cache_Result(access, address, tag, index, offset, hit_or_miss,
+                            mem_refs)
         self.__stats.append(temp)
 
 
 class Cache_Result(object):
+    """
+    Class to display results from our Cache
+    """
 
     def __init__(self, access, address, tag, index, offset, result, mem_refs=0):
+        """
+        Constructor for Cache Result
+        :param access: access to be set
+        :param address: address to be set
+        :param tag: tag to be set
+        :param index: index to be set
+        :param offset: offset to be set
+        :param result: result to be set
+        :param mem_refs: memory references to be set
+        """
         self.__access = access
         self.__address = address
         self.__tag = tag
@@ -309,20 +379,40 @@ class Cache_Result(object):
         self.__mem_refs = mem_refs
 
     def increment_mem_refs(self):
+        """
+        Increments the memory references field
+        :return: None
+        """
         self.__mem_refs += 1
 
     def get_mem_refs(self):
+        """
+        Gets memory references field
+        :return: memory references field
+        """
         return self.__mem_refs
 
     def is_this_result(self, tag, index):
+        """
+        Method to check if tag and index are correct
+        :param tag: tag to be checked
+        :param index: index to be checked
+        :return: true/false variable depending on index and tag
+        """
         is_this_result = False
-        if(tag == self.__tag and index == self.__index):
+        if (tag == self.__tag and index == self.__index):
             is_this_result = True
         return is_this_result
 
     def to_string(self):
-        message = self.__access.rjust(6) + str(self.__address).rjust(9)  + str(self.__tag).rjust(8) \
-                  + str(self.__index).rjust(6) + str(self.__offset).rjust(7) +  self.__result.rjust(7)\
+        """
+        to String method for our Cache_Result object
+        :return: properly formatted message
+        """
+        message = self.__access.rjust(6) + str(self.__address).rjust(9) + str(
+            self.__tag).rjust(8) \
+                  + str(self.__index).rjust(6) + str(self.__offset).rjust(
+            7) + self.__result.rjust(7) \
                   + str(self.__mem_refs).rjust(8)
         return message
 
