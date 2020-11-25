@@ -82,7 +82,10 @@ def go(show_final_stats):
                                      int(index))
             offset_value = int(values[0])
             offset_v = cache.bin_to_dec(offset_value)
-            index_value = int(values[1])
+            if(values[1] == ""):
+                index_value = 0
+            else:
+                index_value = int(values[1])
             index_v = cache.bin_to_dec(index_value)
             tag_value = int(values[2])
             tag_v = cache.bin_to_dec(tag_value)
