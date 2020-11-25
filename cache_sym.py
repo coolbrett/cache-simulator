@@ -4,7 +4,7 @@ from line import Line
 import math
 
 """
-This creates a cheche object and uses a file to access the cache and prints the statistics for it afterwards
+This creates a cache object and uses a file to access the cache and prints the statistics for it afterwards
 __author__:Gatlin Cruz
 __author__: Brett Dale
 __version__: 11/19/20
